@@ -65,7 +65,7 @@ class App extends Component {
             // minTime="08:00:00"         // 時間の範囲（最小値）
             // maxTime="23:00:00"         // 時間の範囲（最小値）
             selectable={true} // 日付選択可能
-            editable={true} // イベントの編集可能
+            // editable={true} // イベントの編集可能
             // eventOverlap={false}       // イベントの重なり禁止
             allDaySlot={false} // alldayの表示設定
             //allDayText={"日ごと選択"} // alldayに表示する文字レス
