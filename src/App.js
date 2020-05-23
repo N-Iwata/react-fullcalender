@@ -25,6 +25,7 @@ class App extends Component {
       inputEnd: new Date(),
       inputTitle: "",
       inputMemo: "",
+      isInputTitle: false,
       isChange: false,
     };
     this.myEvents = [
@@ -50,7 +51,7 @@ class App extends Component {
     this.onDeleteEvent = this.onDeleteEvent.bind(this);
   }
   render() {
-    console.log(this.myEvents);
+    // console.log(this.myEvents);
     return (
       <div>
         {this.renderCover()}
@@ -61,11 +62,11 @@ class App extends Component {
             defaultView="timeGridWeek" // 基本UI
             // contentHeight="auto"
             slotDuration="00:30:00" // 表示する時間軸の最小値
-            // minTime="08:00:00" // 定時の範囲
-            // maxTime="23:00:00" //
+            // minTime="08:00:00"         // 時間の範囲（最小値）
+            // maxTime="23:00:00"         // 時間の範囲（最小値）
             selectable={true} // 日付選択可能
             editable={true} // イベントの編集可能
-            eventOverlap={false} // イベントの重なり禁止
+            // eventOverlap={false}       // イベントの重なり禁止
             allDaySlot={false} // alldayの表示設定
             //allDayText={"日ごと選択"} // alldayに表示する文字レス
             //selectMinDistance={15}                                          // マウスダウン後、選択が許可されるまでのユーザーのマウスの最小移動距離
@@ -91,14 +92,13 @@ class App extends Component {
             events={this.myEvents} // 起動時に登録するイベント
             eventClick={this.handleClick} // イベントクリック時
             select={this.handleSelect} // カレンダー範囲選択時
-            // eventMouseEnter={this.evetnFunc_MouseEnt} // イベント上にマウス
-            // eventMouseLeave={this.evetnFunc_MouseLev} // イベント上のマウス離れ
-
-            // eventDragStart={this.eventFunc_DragStart} // イベントドラッグ開始時
-            // eventDrop={this.eventFunc_Drop} // ドロップ完了時
-            // eventResize={this.eventFunc_Resize} // イベントサイズ変更完了時
-            // dateClick={this.eventFunc_dateClick} // 日付クリック時
-            // eventRender={this.eventFunc_Render}
+            // eventMouseEnter={this.handleMouseEnt}  // イベント上にマウス
+            // eventMouseLeave={this.handleMouseLev}  // イベント上のマウス離れ
+            // eventDragStart={this.handleDragStart}  // イベントドラッグ開始時
+            // eventDrop={this.handleDrop}            // ドロップ完了時
+            // eventResize={this.handleResize}        // イベントサイズ変更完了時
+            // dateClick={this.handledateClick}       // 日付クリック時
+            // eventRender={this.handleRender}
           />
         </div>
       </div>
@@ -115,6 +115,7 @@ class App extends Component {
 
     this.setState({ inputTitle: "" });
     this.setState({ inputMemo: "" });
+    this.setState({ isInputTitle: false });
     this.setState({ inputStart: start });
     this.setState({ inputEnd: end });
     this.setState({ isChange: false });
@@ -131,6 +132,7 @@ class App extends Component {
 
     this.setState({ inputTitle: title });
     this.setState({ inputMemo: memo });
+    this.setState({ isInputTitle: true });
     this.setState({ inputStart: start });
     this.setState({ inputEnd: end });
     this.setState({ isChange: true });
@@ -190,6 +192,12 @@ class App extends Component {
           value={this.state.inputTitle}
           onChange={(e) => {
             this.setState({ inputTitle: e.target.value });
+
+            if (e.target.value === "") {
+              this.setState({ isInputTitle: false });
+            } else {
+              this.setState({ isInputTitle: true });
+            }
           }}
         />
       </React.Fragment>
@@ -267,6 +275,7 @@ class App extends Component {
               className="container__form__btn_save"
               type="button"
               value="保存"
+              disabled={!this.state.isInputTitle}
               onClick={this.onAddEvent}
             />
           </div>
@@ -329,7 +338,6 @@ class App extends Component {
       const starttime = this.changeDateToString(this.state.inputStart);
       const endtime = this.changeDateToString(this.state.inputEnd);
 
-      // 時間チェック
       if (starttime >= endtime) {
         alert("開始時間と終了時間を確認してください。");
         return;
@@ -370,15 +378,13 @@ class App extends Component {
     this.myEvents.push(ev);
     this.ref.current.getApi().addEvent(ev);
 
-    return true; // 正常終了
+    return true;
   };
   changeEvent = (ev, col = "red") => {
-    // イベント変更
     this.myEvents[ev.id].title = ev.title;
     this.myEvents[ev.id].start = ev.start;
     this.myEvents[ev.id].end = ev.end;
 
-    // 一旦削除してから追加
     this.ref.current.getApi().getEventById(ev.id).remove();
     this.ref.current.getApi().addEvent(this.myEvents[ev.id]);
 
