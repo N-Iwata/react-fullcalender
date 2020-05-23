@@ -382,6 +382,7 @@ class App extends Component {
   };
   changeEvent = (ev, col = "red") => {
     this.myEvents[ev.id].title = ev.title;
+    this.myEvents[ev.id].memo = ev.memo;
     this.myEvents[ev.id].start = ev.start;
     this.myEvents[ev.id].end = ev.end;
 
